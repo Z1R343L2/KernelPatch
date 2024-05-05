@@ -149,6 +149,11 @@ int fillin_patch_symbol(kallsym_t *kallsym, char *img_buf, int imglen, patch_sym
 
     symbol->input_handle_event = get_symbol_offset_zero(kallsym, img_buf, "input_handle_event");
 
+    symbol->sys_setuid = get_symbol_offset_zero(kallsym, img_buf, "__sys_setuid");
+    symbol->sys_setreuid = get_symbol_offset_zero(kallsym, img_buf, "__sys_setreuid");
+    symbol->sys_setresuid = get_symbol_offset_zero(kallsym, img_buf, "__sys_setresuid");
+    symbol->sys_setfsuid = get_symbol_offset_zero(kallsym, img_buf, "__sys_setfsuid");
+
     if ((is_be() ^ target_is_be)) {
         for (int64_t *pos = (int64_t *)symbol; pos <= (int64_t *)symbol; pos++) {
             *pos = i64swp(*pos);

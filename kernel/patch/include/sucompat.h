@@ -12,6 +12,8 @@
 struct allow_uid
 {
     uid_t uid;
+    uint32_t allow;
+    uint32_t exclude;
     struct su_profile profile;
     struct list_head list;
     struct rcu_head rcu;
@@ -19,5 +21,6 @@ struct allow_uid
 
 struct su_profile profile_su_allow_uid(uid_t uid);
 int is_su_allow_uid(uid_t uid);
+int uid_should_exclude(uid_t uid);
 
 #endif

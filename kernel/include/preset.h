@@ -129,6 +129,10 @@ struct patch_symbol
             uint64_t avc_denied;
             uint64_t slow_avc_audit;
             uint64_t input_handle_event;
+            uint64_t sys_setuid;
+            uint64_t sys_setreuid;
+            uint64_t sys_setresuid;
+            uint64_t sys_setfsuid;
         };
         char _cap[PATCH_SYMBOL_LEN];
     };

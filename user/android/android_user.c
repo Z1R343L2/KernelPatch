@@ -103,32 +103,34 @@ static void load_config_allow_uids()
         char *sallow = csv_val(header, line, "allow");
         if (!sallow) continue;
 
-        if (!atol(sallow)) {
-            free(sallow);
-            continue;
-        }
-
         char *spkg = csv_val(header, line, "pkg");
         char *suid = csv_val(header, line, "uid");
         char *sto_uid = csv_val(header, line, "to_uid");
+        char *sexclude = csv_val(header, line, "exclude");
         char *ssctx = csv_val(header, line, "sctx");
 
-        if (!spkg || !suid || !sto_uid || !ssctx) continue;
+        if (!spkg || !suid || !sto_uid || !sexclude || !ssctx) goto free;
 
-        log_kernel("grant pkg: %s, uid: %s, to_uid: %s, sctx: %s\n", spkg, suid, sto_uid, ssctx);
+        log_kernel("grant pkg: %s, uid: %s, to_uid: %s, allow: %d, exclude: %d, sctx: %s\n", spkg, suid, sto_uid,
+                   sallow, sexclude, ssctx);
 
         uid_t to_uid = atol(sto_uid);
         struct su_profile profile = { 0 };
         profile.uid = atol(suid);
         profile.to_uid = to_uid;
+        profile.allow = atol(sallow);
+        profile.exclude = atol(sexclude);
         if (ssctx) strncpy(profile.scontext, ssctx, sizeof(profile.scontext) - 1);
 
         sc_su_grant_uid(key, profile.uid, &profile);
 
-        free(spkg);
-        free(suid);
-        free(sto_uid);
-        free(ssctx);
+    free:
+        if (spkg) free(spkg);
+        if (suid) free(suid);
+        if (sto_uid) free(sto_uid);
+        if (sallow) free(sallow);
+        if (sexclude) free(sexclude);
+        if (ssctx) free(ssctx);
     }
 
 out:

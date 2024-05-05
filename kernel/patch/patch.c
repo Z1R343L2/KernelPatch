@@ -89,6 +89,11 @@ static void before_rest_init(hook_fargs4_t *args, void *udata)
 
     rc = kpuserd_init();
     log_boot("kpuserd_init done: %d\n", rc);
+
+    if (kver >= VERSION(5, 9, 0)) {
+        rc = kp_umount_init();
+        log_boot("kp_umount_init done: %d\n", rc); 
+    }
 #endif
 
 out:
