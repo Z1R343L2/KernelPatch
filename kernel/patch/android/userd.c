@@ -418,10 +418,11 @@ int kpuserd_init()
 
     unsigned long input_handle_event_addr = get_preset_patch_sym()->input_handle_event;
     log_boot("input handle event is: %llx", input_handle_event_addr);
-    // TODO: Check addr validation
-    rc = hook_wrap4((void *)input_handle_event_addr, before_input_handle_event, 0, 0);
-    ret |= rc;
-    log_boot("hook input_handle_event rc: %d\n", rc);
+    if (likely(input_handle_event_addr)) {
+        rc = hook_wrap4((void *)input_handle_event_addr, before_input_handle_event, 0, 0);
+        ret |= rc;
+        log_boot("hook input_handle_event rc: %d\n", rc);
+    }
 
     return ret;
 }
