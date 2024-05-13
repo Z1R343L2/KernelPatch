@@ -38,42 +38,42 @@ static inline uid_t new_cred_uid() {
 }
 
 static inline void handle_umount(uid_t new_uid, uid_t old_uid) {
-   logkfi("[GarfieldHan] new_uid: %d, old_uid: %d\n", new_uid, old_uid);
+   log_boot("[GarfieldHan] new_uid: %d, old_uid: %d\n", new_uid, old_uid);
 
     if (0 != old_uid) {
-        logkfi("[GarfieldHan] old process is not root, ignore it.\n");
+        log_boot("[GarfieldHan] old process is not root, ignore it.\n");
         return 0;
     }
 
     if (!is_appuid(new_uid) || is_unsupported_uid(new_uid)) {
-        logkfi("[GarfieldHan] handle setuid ignore non application or isolated uid: %d\n", new_uid);
+        log_boot("[GarfieldHan] handle setuid ignore non application or isolated uid: %d\n", new_uid);
         return 0;
     }
 
     if (unlikely(is_su_allow_uid(new_uid))) {
-        logkfi("[GarfieldHan] handle setuid ignore allowed application: %d\n", new_uid);
+        log_boot("[GarfieldHan] handle setuid ignore allowed application: %d\n", new_uid);
         return 0;
     }
 
     if (likely(!uid_should_exclude(new_uid))) {
         return 0;
     } else {
-        logkfi("[GarfieldHan] uid: %d should umount!\n", current_uid());
+        log_boot("[GarfieldHan] uid: %d should umount!\n", current_uid());
     }
 
     // check old process's selinux context, if it is not zygote, ignore it!
     // because some su apps may setuid to untrusted_app but they are in global mount namespace
     // when we umount for such process, that is a disaster!
-    logkfi("[GarfieldHan] check zygote");
+    log_boot("[GarfieldHan] check zygote");
     bool is_zygote_child = is_zygote(current);
     if (!is_zygote_child) {
-        logkfi("[GarfieldHan] handle umount ignore non zygote child: %d\n", current_ext->pid);
+        log_boot("[GarfieldHan] handle umount ignore non zygote child: %d\n", current_ext->pid);
         return 0;
     }
-    logkfi("[GarfieldHan] zygote check is ok");
+    log_boot("[GarfieldHan] zygote check is ok");
 
     // umount the target mnt
-    logkfi("[GarfieldHan] handle umount for uid: %d, pid: %d\n", new_uid, current_ext->pid);
+    log_boot("[GarfieldHan] handle umount for uid: %d, pid: %d\n", new_uid, current_ext->pid);
 
     // fixme: use `collect_mounts` and `iterate_mount` to iterate all mountpoint and
     // filter the mountpoint whose target is `/data/adb`
@@ -86,12 +86,12 @@ static inline void handle_umount(uid_t new_uid, uid_t old_uid) {
     try_umount("/debug_ramdisk", false, MNT_DETACH);
     try_umount("/sbin", false, MNT_DETACH);
 
-    logkfi("[GarfieldHan] kp umount is done!\n");
+    log_boot("[GarfieldHan] kp umount is done!\n");
 }
 
 static long before_sys_setalluid(hook_fargs3_t *args, void *udata)
 {
-    //logkfi("[GarfieldHan] enter sys_setXuid, uid: %d \n", (uid_t) args->arg0);
+    log_boot("[GarfieldHan] enter sys_setXuid, uid: %d \n", (uid_t) args->arg0);
     handle_umount((uid_t) args->arg0, current_uid());
     return 0;
 }
