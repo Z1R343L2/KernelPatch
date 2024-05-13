@@ -76,7 +76,6 @@ static void try_umount(const char *mnt, bool check_mnt, int flags)
         return;
     }
 
-    // we are only interest in some specific mounts
     if (check_mnt && !should_umount(&path)) {
         return;
     }
