@@ -60,11 +60,7 @@ static inline bool should_umount(struct path *path)
 
 static inline int umount_mnt(struct path *path, int flags)
 {
-    if (kver >= VERSION(5, 9, 0)) {
-        return path_umount(path, flags);
-    } else {
-        return -ENOSYS;
-    }
+    return path_umount(path, flags);
 }
 
 static void try_umount(const char *mnt, bool check_mnt, int flags)
